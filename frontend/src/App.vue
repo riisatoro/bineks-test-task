@@ -4,6 +4,7 @@ export default {
     const personData = {maxHP: 100, currentHP: 100, name: 'Person'};
 
     return {
+      instanceMapKeys: ['user', 'monster'],
       user: Object.assign({}, personData),
       monster: Object.assign({}, personData),
     }
@@ -12,6 +13,7 @@ export default {
     randomizeMonsterData(min, max) {
       this.monster.maxHP = Math.floor(Math.random() * (max - min) + min);
       this.monster.currentHP = this.monster.maxHP;
+      console.log(this.monster.currentHP)
     },
 
     getPersonData(personType) {
@@ -24,15 +26,14 @@ export default {
     },
 
     progressStatus(personType) {
-      const progress = this.getProgressPercent(personType);
-      switch (progress) {
-        case progress < 30:
-          return 'bg-danger';
-        case progress < 60:
-          return 'bg-warning';
-        default:
-          return 'bg-success';
+      const progressPercent = this.getProgressPercent(personType);
+      if (progressPercent > 60) {
+        return 'bg-success';
+      } else if (progressPercent > 30) {
+        return 'bg-warning';
       }
+      return 'bg-danger';
+
     },
 
     progressWidth(personType) {
@@ -52,24 +53,18 @@ export default {
     <h1 class="text-center my-3 mb-5">Monster fight app</h1>
     
     <div class="container border shadow-sm d-flex justify-content-around py-5">
-      <div class="progress w-100 mx-2">
+      <div 
+        class="progress w-100 mx-2"
+        v-for="(instance, index) in instanceMapKeys"
+        :key="index"
+      >
         <div 
           class="progress-bar"
           role="progressbar"
-          :style="progressWidth('player')"
-          :class="progressStatus('player')"
+          :style="progressWidth(instance)"
+          :class="progressStatus(instance)"
         >
-        <p class="mb-0">Player: {{ this.user.currentHP }} HP</p>
-        </div>
-      </div>
-      <div class="progress w-100 mx-2">
-        <div 
-          class="progress-bar"
-          role="progressbar"
-          :style="progressWidth('monster')"
-          :class="progressStatus('monster')"
-        >
-          <p class="mb-0">Monster: {{ this.user.currentHP }} HP</p>
+        <p class="mb-0">{{instance}}: {{ this[instance].currentHP }} HP</p>
         </div>
       </div>
     </div>
