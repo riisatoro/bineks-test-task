@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { logsStore } from './logsStore';
 
 const personData = {maxHP: 100, currentHP: 100, name: 'Person'};
 
@@ -28,6 +29,7 @@ export const battleStore = reactive({
   },
 
   startNewBattle() {
+    logsStore.log('bg-warning', 'A new monster appears');
     this.refreshMonster();
     this.refreshPlayer();
   },

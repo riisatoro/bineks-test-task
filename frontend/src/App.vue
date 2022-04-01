@@ -1,11 +1,13 @@
 <script>
-import { battleStore, randint } from './store';
+import { battleStore, randint } from './gameStore';
+import { logsStore } from './logsStore';
 
 export default {
   data() {
     return { 
       instanceMapKeys: ['user', 'monster'],
       game: battleStore,
+      logger: logsStore,
     }
   },
 
@@ -35,16 +37,19 @@ export default {
     },
 
     personDied(personType) {
-      window.alert(
-        personType === 'monster'
+      const message = personType === 'monster'
         ? 'Congrats! You win!'
-        : 'You died! Good luck next time!'
-      );
+        : 'You died! Good luck next time!';
+      const logType = personType == 'user' ? 'bg-danger' : 'bg-success';
+
+      this.logger.log(logType, message);
+      window.alert(message);
     },
 
     attack(personType, multiply) {
       const damage = randint(1, 10) * multiply;
       const isAlive = this.game.setDamage(personType, damage);
+      this.logger.logAttack(personType, multiply, damage);
 
       if (!isAlive) { this.personDied(personType); this.game.startNewBattle(); }
       if (isAlive && personType == 'monster') this.attack('user', multiply);
@@ -53,6 +58,7 @@ export default {
     heal(e) {
       const hp = randint(5, 15);
       this.game.setHeal('user', hp);
+      this.logger.log('bg-success', `You heal by ${hp} HP`)
       this.attack('user', 1);
     },
 
@@ -95,5 +101,23 @@ export default {
       <button class="btn btn-success mx-2" @click="heal">Heal</button>
       <button class="btn btn-danger mx-2" @click="surrend">Surrend</button>
     </div>
+
+    <div v-if="logger.logs.length > 0" class="container border shadow-sm text-center py-2 my-5 scrollable">
+      <div 
+       v-for="(instance, index) in logger.logs" 
+       :key="index" 
+       :class="instance.logType"
+       class="my-1"
+      >
+        <b><span class="text-white">{{ instance.message }}</span></b>
+      </div>
+    </div>
   </div>
 </template>
+
+<style>
+  .scrollable {
+    height: 50vh;
+    overflow-y: scroll;
+  }
+</style>
