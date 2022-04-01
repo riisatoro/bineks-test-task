@@ -10,10 +10,18 @@ export default {
     }
   },
   methods: {
+    randint(min, max) {
+      return Math.floor(Math.random() * (max - min) + min);
+    },
+
     randomizeMonsterData(min, max) {
-      this.monster.maxHP = Math.floor(Math.random() * (max - min) + min);
+      this.monster.maxHP = this.randint(min, max);
       this.monster.currentHP = this.monster.maxHP;
-      console.log(this.monster.currentHP)
+    },
+
+    updateUserData(hp) {
+      this.user.maxHP = hp;
+      this.user.currentHP = hp;
     },
 
     getPersonData(personType) {
@@ -40,6 +48,42 @@ export default {
       return `width: ${this.getProgressPercent(personType)}%`
     },
 
+    startNewBattle() {
+      this.randomizeMonsterData(50, 150);
+      this.updateUserData(100);
+    },
+
+    checkPersonDied(personType) {
+      if (this[personType].currentHP > 0) return false;
+      window.alert(
+        personType === 'monster'
+        ? 'Congrats! You win!'
+        : 'You died! Good luck next time!'
+      );
+      return true;
+    },
+
+    attack(personType, multiply) {
+      const damage = this.randint(1, 10) * multiply;
+      this[personType].currentHP -= damage;
+      const isDead = this.checkPersonDied(personType);
+
+      if (!isDead && personType == 'monster') this.attack('user', multiply);
+      if (isDead) this.startNewBattle();
+  
+    },
+
+    heal(e) {
+      this.user.currentHP += this.randint(5, 10);
+      this.user.currentHP > this.user.maxHP ? this.user.currentHP = this.user.maxHP : '';
+      this.attack('user', 1);
+    },
+
+    surrend(e) {
+      window.alert('You have been surrended! Good luck next time!');
+      this.startNewBattle();
+    }
+
   },
 
   mounted () {
@@ -64,10 +108,16 @@ export default {
           :style="progressWidth(instance)"
           :class="progressStatus(instance)"
         >
-        <p class="mb-0">{{instance}}: {{ this[instance].currentHP }} HP</p>
+        <p class="mb-0 text-center">{{instance}}: {{ this[instance].currentHP }} HP</p>
         </div>
       </div>
     </div>
   
+    <div class="container border shadow-sm d-flex justify-content-center py-2 my-3">
+      <button class="btn btn-primary mx-2" @click="() => attack('monster', 1)">Hit</button>
+      <button class="btn btn-warning mx-2" @click="() => attack('monster', 2)">Super Hit</button>
+      <button class="btn btn-success mx-2" @click="heal">Heal</button>
+      <button class="btn btn-danger mx-2" @click="surrend">Surrend</button>
+    </div>
   </div>
 </template>
