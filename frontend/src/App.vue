@@ -1,14 +1,7 @@
 <script>
 import useStore from './store';
-import {
-  DAMAGE_TO,
-  MIN_DAMAGE,
-  MAX_DAMAGE,
-  MIN_HEAL,
-  MAX_HEAL,
-  POWER_MIN_MULTIPLIER,
-  POWER_MAX_MULTIPLIER,
-} from './constants';
+import ActionComponent from './components/Actions.vue';
+import LogsComponent from './components/Logs.vue';
 
 export default {
   data() {
@@ -16,6 +9,10 @@ export default {
       instanceMapKeys: ['user', 'monster'],
       store: useStore(),
     }
+  },
+
+  components: {
+    ActionComponent, LogsComponent
   },
 
   methods: {
@@ -32,19 +29,6 @@ export default {
     progressWidth(personType) {
       return `width: ${this.store.getHpPercent(personType)}%`
     },
-
-    hit(e, person='user') {
-    },
-
-    superHit(e, person='user') {
-    },
-
-    heal(e, person='user') {
-    },
-
-    surrend() {
-
-    },
     
   },
 }
@@ -53,7 +37,7 @@ export default {
 <template>
   <div class="container">
     <h1 class="text-center my-3 mb-5">Monster fight app</h1>
-    
+
     <div class="container border shadow-sm d-flex justify-content-around py-5">
       <div 
         class="progress w-100 mx-2"
@@ -71,23 +55,9 @@ export default {
       </div>
     </div>
 
-    <div class="container border shadow-sm d-flex justify-content-center py-2 my-3">
-      <button class="btn btn-primary mx-2" @click="hit">Hit</button>
-      <button class="btn btn-warning mx-2" @click="superHit">Super Hit</button>
-      <button class="btn btn-success mx-2" @click="heal">Heal</button>
-      <button class="btn btn-danger mx-2" @click="surrend">Surrend</button>
-    </div>
+    <action-component></action-component>
+    <logs-component></logs-component>
 
-    <div v-if="this.store.logs.logs.length > 0" class="container border shadow-sm text-center py-2 my-5 scrollable">
-      <div
-       v-for="(instance, index) in this.store.logs.logs" 
-       :key="index" 
-       :class="instance.type"
-       class="my-1"
-      >
-        <b><span class="text-white">{{ instance.message }}</span></b>
-      </div>
-    </div>
   </div>
 </template>
 
