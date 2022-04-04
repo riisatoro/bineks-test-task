@@ -1,35 +1,15 @@
 # bineks-frontend
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Simple monster fight game with a bit of random.
+Detailed description ...soon...
 
 ## Project Setup
 
-```sh
-npm install
-```
+Go to the `frontent` folder, run:  
+`npm install`
 
-### Compile and Hot-Reload for Development
 
-```sh
-npm run dev
-```
+### Run
 
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+In `frontend` folder, run:  
+`npm run dev`
