@@ -1,76 +1,52 @@
 <script>
-import { battleStore, randint } from './gameStore';
-import { logsStore } from './logsStore';
+import useStore from './store';
+import {
+  DAMAGE_TO,
+  MIN_DAMAGE,
+  MAX_DAMAGE,
+  MIN_HEAL,
+  MAX_HEAL,
+  POWER_MIN_MULTIPLIER,
+  POWER_MAX_MULTIPLIER,
+} from './constants';
 
 export default {
   data() {
     return { 
       instanceMapKeys: ['user', 'monster'],
-      game: battleStore,
-      logger: logsStore,
+      store: useStore(),
     }
   },
 
   methods: {
-    getPersonData(personType) {
-      return personType === 'user' ? this.game.user : this.game.monster;
-    },
-
-    getProgressPercent(personType) {
-      const data = this.getPersonData(personType);
-      return Math.floor(data.currentHP / (data.maxHP / 100));
-    },
-
     progressStatus(personType) {
-      const progressPercent = this.getProgressPercent(personType);
-      if (progressPercent > 60) {
+      const hpPercent = this.store.getHpPercent(personType);
+      if (hpPercent > 60) {
         return 'bg-success';
-      } else if (progressPercent > 30) {
+      } else if (hpPercent > 30) {
         return 'bg-warning';
       }
       return 'bg-danger';
-
     },
 
     progressWidth(personType) {
-      return `width: ${this.getProgressPercent(personType)}%`
+      return `width: ${this.store.getHpPercent(personType)}%`
     },
 
-    personDied(personType) {
-      const message = personType === 'monster'
-        ? 'Congrats! You win!'
-        : 'You died! Good luck next time!';
-      const logType = personType == 'user' ? 'bg-danger' : 'bg-success';
-
-      this.logger.log(logType, message);
-      window.alert(message);
+    hit(e, person='user') {
     },
 
-    attack(personType, multiply) {
-      const damage = randint(1, 10) * multiply;
-      const isAlive = this.game.setDamage(personType, damage);
-      this.logger.logAttack(personType, multiply, damage);
-
-      if (!isAlive) { this.personDied(personType); this.game.startNewBattle(); }
-      if (isAlive && personType == 'monster') this.attack('user', multiply);
+    superHit(e, person='user') {
     },
 
-    heal(e) {
-      const hp = randint(5, 15);
-      this.game.setHeal('user', hp);
-      this.logger.log('bg-success', `You heal by ${hp} HP`)
-      this.attack('user', 1);
+    heal(e, person='user') {
     },
 
-    surrend(e) {
-      window.alert('You have been surrended! Good luck next time!');
-      this.game.startNewBattle();
-    }
+    surrend() {
+
+    },
+    
   },
-
-  mounted () {
-    this.game.refreshMonster();
-  }
 }
 </script>
 
@@ -90,23 +66,23 @@ export default {
           :style="progressWidth(instance)"
           :class="progressStatus(instance)"
         >
-        <p class="mb-0 text-center">{{instance}}: {{ this.game[instance].currentHP }} HP</p>
+        <p class="mb-0 text-center">{{ instance }}: {{ this.store[instance].currentHP }} HP</p>
         </div>
       </div>
     </div>
-  
+
     <div class="container border shadow-sm d-flex justify-content-center py-2 my-3">
-      <button class="btn btn-primary mx-2" @click="() => attack('monster', 1)">Hit</button>
-      <button class="btn btn-warning mx-2" @click="() => attack('monster', 2)">Super Hit</button>
+      <button class="btn btn-primary mx-2" @click="hit">Hit</button>
+      <button class="btn btn-warning mx-2" @click="superHit">Super Hit</button>
       <button class="btn btn-success mx-2" @click="heal">Heal</button>
       <button class="btn btn-danger mx-2" @click="surrend">Surrend</button>
     </div>
 
-    <div v-if="logger.logs.length > 0" class="container border shadow-sm text-center py-2 my-5 scrollable">
-      <div 
-       v-for="(instance, index) in logger.logs" 
+    <div v-if="this.store.logs.logs.length > 0" class="container border shadow-sm text-center py-2 my-5 scrollable">
+      <div
+       v-for="(instance, index) in this.store.logs.logs" 
        :key="index" 
-       :class="instance.logType"
+       :class="instance.type"
        class="my-1"
       >
         <b><span class="text-white">{{ instance.message }}</span></b>
