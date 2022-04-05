@@ -28,15 +28,26 @@ export default {
 
     progressWidth(personType) {
       return `width: ${this.store.getHpPercent(personType)}%`
-    },
-    
+    },    
   },
+
+  computed: {
+    getMonsterImg() {
+      const imgNumber = this.store.randint(1, 5);
+      return `./src/assets/monster_${imgNumber}.gif`;
+    },
+  }
 }
 </script>
 
 <template>
   <div class="container">
     <h1 class="text-center my-3 mb-5">Monster fight app</h1>
+
+    <div>
+      <img src="./assets/user.gif" />
+      <img :src="getMonsterImg" />
+    </div>
 
     <div class="container border shadow-sm d-flex justify-content-around py-5">
       <div 
